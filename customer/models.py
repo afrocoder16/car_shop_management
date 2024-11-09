@@ -14,11 +14,6 @@ class Customer(models.Model):
     vin_number = models.CharField(max_length=15, unique=True, default="Unknown")
     license_plate = models.CharField(max_length=15, unique=True, default="Unknown")  # Add a default for license plate
 
-
-
-
-
-
     # Service History (Relationship to Service model - one-to-many)
     # Service history will be tracked in the Service model
 
