@@ -1,8 +1,74 @@
-# React + Vite
+# Car Shop Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Getting Started
 
-Currently, two official plugins are available:
+### Prerequisites
+Make sure you have the following installed:
+- **Python** (version 3.8 or above)
+- **Node.js** (version 14 or above)
+- **npm** (comes with Node.js)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+
+## Running the Backend (Django)
+
+1. **Navigate to the Project Directory**:
+   ```bash
+   cd car_shop_management
+   ```
+
+2. **Create and Activate a Virtual Environment**:
+   - On Windows:
+     ```bash
+     python -m venv env
+     env\Scripts\activate
+     ```
+   - On Mac/Linux:
+     ```bash
+     python3 -m venv env
+     source env/bin/activate
+     ```
+
+3. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Apply Migrations**:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+5. **Run the Backend Server**:
+   ```bash
+   python manage.py runserver
+   ```
+   The backend will be running at `http://127.0.0.1:8000`.
+
+---
+
+## Running the Frontend (React)
+
+1. **Navigate to the `src` Directory**:
+   ```bash
+   cd src
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the Frontend Server**:
+   ```bash
+   npm start
+   ```
+   The frontend will be running at `http://localhost:3000`.
+
+---
+
+## Accessing the Application
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://127.0.0.1:8000`
