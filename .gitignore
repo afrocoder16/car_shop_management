@@ -22,3 +22,18 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+user@Habtamus-MacBook-Air capston project % cd Habtshicapston 
+user@Habtamus-MacBook-Air Habtshicapston % # Ignore Python cache files
+*.pyc
+__pycache__/
+
+# Ignore virtual environments
+env/
+venv/
+
+# Ignore untracked directories or files
+car_shop_management/
+
+zsh: command not found: #
+zsh: no matches found: *.pyc
+user@Habtamus-MacBook-Air Habtshicapston % 
