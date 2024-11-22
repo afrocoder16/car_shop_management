@@ -5,7 +5,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
-    address = models.TextField()
+    address = models.TextField(blank=True, null=True)
 
     
     car_make = models.CharField(max_length=50, default="Unknown")

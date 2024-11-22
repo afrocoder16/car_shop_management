@@ -3,8 +3,18 @@ import React, { useState } from 'react';
 export default function AppointmentBooking() {
   const [formData, setFormData] = useState({
     name: '',
-    phone: '',
+    phone_number: '',
     email: '',
+    address: '',
+    car_make: 'Unknown',
+    car_model: 'Unknown',
+    car_year: 2000,
+    vin_number: 'Unknown',
+    license_plate: 'Unknown',
+    loyalty_points: 0,
+    membership_level: '',
+    preferred_service_time: '',
+    emergency_contact: '',
     date: '',
     time: '',
     serviceType: '',
@@ -16,21 +26,86 @@ export default function AppointmentBooking() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically handle form submission to a server
-    console.log('Appointment data submitted:', formData);
-    alert('Your appointment has been booked successfully!');
-    // Clear the form
-    setFormData({
-      name: '',
-      phone: '',
-      email: '',
-      date: '',
-      time: '',
-      serviceType: '',
-      notes: '',
-    });
+  
+    try {
+      // Create or find the customer
+      const customerResponse = await fetch('http://127.0.0.1:8000/api/customers/customers/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phone_number: formData.phone_number,
+          email: formData.email,
+          address: formData.address,
+          car_make: formData.car_make,
+          car_model: formData.car_model,
+          car_year: formData.car_year,
+          vin_number: formData.vin_number,
+          license_plate: formData.license_plate,
+          loyalty_points: formData.loyalty_points,
+          membership_level: formData.membership_level,
+          preferred_service_time: formData.preferred_service_time,
+          emergency_contact: formData.emergency_contact,
+        }),
+      });
+  
+      const customerData = await customerResponse.json();
+  
+      if (!customerResponse.ok) {
+        // Show error if customer creation fails
+        alert('Error creating customer: ' + JSON.stringify(customerData));
+        return;
+      }
+  
+      // Create the appointment
+      const appointmentResponse = await fetch('http://127.0.0.1:8000/api/services/appointments/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer: customerData.id,
+          appointment_date: formData.date,
+          appointment_time: formData.time,
+          service_type: formData.serviceType,
+          notes: formData.notes,
+          status: 'Pending',
+        }),
+      });
+  
+      if (appointmentResponse.ok) {
+        alert('Your appointment has been booked successfully!');
+        setFormData({
+          name: '',
+          phone_number: '',
+          email: '',
+          address: '',
+          car_make: 'Unknown',
+          car_model: 'Unknown',
+          car_year: 2000,
+          vin_number: 'Unknown',
+          license_plate: 'Unknown',
+          loyalty_points: 0,
+          membership_level: '',
+          preferred_service_time: '',
+          emergency_contact: '',
+          date: '',
+          time: '',
+          serviceType: '',
+          notes: '',
+        });
+      } else {
+        const appointmentError = await appointmentResponse.json();
+        alert('Error booking appointment: ' + JSON.stringify(appointmentError));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to book the appointment. Please try again later.');
+    }
   };
 
   return (
@@ -39,7 +114,7 @@ export default function AppointmentBooking() {
         <h2 className="text-3xl font-semibold mb-6 text-center">Book an Appointment</h2>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Customer Name */}
+          {/* Full Name */}
           <div>
             <label htmlFor="name" className="block mb-1">Full Name</label>
             <input
@@ -55,12 +130,12 @@ export default function AppointmentBooking() {
 
           {/* Phone Number */}
           <div>
-            <label htmlFor="phone" className="block mb-1">Phone Number</label>
+            <label htmlFor="phone_number" className="block mb-1">Phone Number</label>
             <input
               type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
+              id="phone_number"
+              name="phone_number"
+              value={formData.phone_number}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 text-black rounded"
@@ -77,6 +152,60 @@ export default function AppointmentBooking() {
               value={formData.email}
               onChange={handleChange}
               required
+              className="w-full px-3 py-2 text-black rounded"
+            />
+          </div>
+
+          {/* Address */}
+          <div>
+            <label htmlFor="address" className="block mb-1">Address</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-black rounded"
+            />
+          </div>
+
+          {/* VIN Number */}
+          <div>
+            <label htmlFor="vin_number" className="block mb-1">VIN Number</label>
+            <input
+              type="text"
+              id="vin_number"
+              name="vin_number"
+              value={formData.vin_number}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
+            />
+          </div>
+
+          {/* License Plate */}
+          <div>
+            <label htmlFor="license_plate" className="block mb-1">License Plate</label>
+            <input
+              type="text"
+              id="license_plate"
+              name="license_plate"
+              value={formData.license_plate}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
+            />
+          </div>
+
+          {/* Emergency Contact */}
+          <div>
+            <label htmlFor="emergency_contact" className="block mb-1">Emergency Contact</label>
+            <input
+              type="text"
+              id="emergency_contact"
+              name="emergency_contact"
+              value={formData.emergency_contact}
+              onChange={handleChange}
               className="w-full px-3 py-2 text-black rounded"
             />
           </div>
@@ -121,10 +250,10 @@ export default function AppointmentBooking() {
               className="w-full px-3 py-2 text-black rounded"
             >
               <option value="">Select a service</option>
-              <option value="Oil Change">Oil Change</option>
-              <option value="Tire Rotation">Tire Rotation</option>
-              <option value="Brake Inspection">Brake Inspection</option>
-              <option value="Engine Diagnostics">Engine Diagnostics</option>
+              <option value="1">Oil Change</option>
+              <option value="2">Tire Rotation</option>
+              <option value="3">Brake Inspection</option>
+              <option value="4">Engine Diagnostics</option>
             </select>
           </div>
 
