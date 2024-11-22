@@ -1,45 +1,44 @@
 from django.db import models
-from customer.models import Customer  # Assuming Customer model is in customer app
-from mechanic.models import Mechanic  # Assuming Mechanic model is in mechanic app
+from customer.models import Customer  
+from mechanic.models import Mechanic  
 
 class ServiceType(models.Model):
-    name = models.CharField(max_length=100)  # Name of the service (e.g., Oil Change)
-    description = models.TextField()  # Short description of the service
-    base_price = models.DecimalField(max_digits=10, decimal_places=2)  # Base price for the service
+    name = models.CharField(max_length=100)  
+    description = models.TextField()  
+    base_price = models.DecimalField(max_digits=10, decimal_places=2)  
 
     def __str__(self):
         return self.name
 
 
 class PartInventory(models.Model):
-    part_name = models.CharField(max_length=100)  # Name of the part
-    quantity = models.IntegerField()  # Quantity available in stock
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # Cost of the part
-    supplier = models.CharField(max_length=100)  # Supplier information
+    part_name = models.CharField(max_length=100)  
+    quantity = models.IntegerField() 
+    price = models.DecimalField(max_digits=10, decimal_places=2)  
+    supplier = models.CharField(max_length=100)  
 
     def __str__(self):
         return self.part_name
 
 
 class Service(models.Model):
-    # Basic Information
-    service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE)  # Type of service (from ServiceType model)
+    service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE) 
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('In Progress', 'In Progress'), ('Completed', 'Completed')])
-    service_date = models.DateField()  # Date service started
-    completion_date = models.DateField(blank=True, null=True)  # Date service was completed
+    service_date = models.DateField() 
+    completion_date = models.DateField(blank=True, null=True)  
 
-    # Cost and Parts
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2)  # Total cost of the service
-    payment_status = models.CharField(max_length=20, choices=[('Paid', 'Paid'), ('Unpaid', 'Unpaid')])  # Payment status
-    estimated_cost = models.DecimalField(max_digits=10, decimal_places=2)  # Estimated cost before actual service cost
-    invoice_number = models.CharField(max_length=50, unique=True)  # Unique identifier for the invoice
-    parts_used = models.ManyToManyField(PartInventory)  # List of parts used in the service
-    labor_hours = models.DecimalField(max_digits=5, decimal_places=2)  # Number of labor hours worked on the service
+    
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2) 
+    payment_status = models.CharField(max_length=20, choices=[('Paid', 'Paid'), ('Unpaid', 'Unpaid')])  
+    estimated_cost = models.DecimalField(max_digits=10, decimal_places=2)  
+    invoice_number = models.CharField(max_length=50, unique=True) 
+    parts_used = models.ManyToManyField(PartInventory) 
+    labor_hours = models.DecimalField(max_digits=5, decimal_places=2)  
 
-    # Additional Details
-    priority = models.CharField(max_length=10, choices=[('High', 'High'), ('Medium', 'Medium'), ('Low', 'Low')])  # Job prioritization
-    service_notes = models.TextField(blank=True, null=True)  # Mechanic’s notes regarding the service
-    estimated_completion_time = models.TimeField(blank=True, null=True)  # Estimated time to finish the service
+    
+    priority = models.CharField(max_length=10, choices=[('High', 'High'), ('Medium', 'Medium'), ('Low', 'Low')])  
+    service_notes = models.TextField(blank=True, null=True)  
+    estimated_completion_time = models.TimeField(blank=True, null=True)  
 
     # Customer Feedback
     customer_feedback = models.TextField(blank=True, null=True)  # Feedback or comments left by the customer

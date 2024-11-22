@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 export default function AppointmentBooking() {
   const [formData, setFormData] = useState({
     name: '',
-    contact: '',
+    phone: '',
+    email: '',
     date: '',
     time: '',
     serviceType: '',
@@ -23,7 +24,8 @@ export default function AppointmentBooking() {
     // Clear the form
     setFormData({
       name: '',
-      contact: '',
+      phone: '',
+      email: '',
       date: '',
       time: '',
       serviceType: '',
@@ -51,14 +53,28 @@ export default function AppointmentBooking() {
             />
           </div>
 
-          {/* Contact Information */}
+          {/* Phone Number */}
           <div>
-            <label htmlFor="contact" className="block mb-1">Contact (Phone or Email)</label>
+            <label htmlFor="phone" className="block mb-1">Phone Number</label>
             <input
-              type="text"
-              id="contact"
-              name="contact"
-              value={formData.contact}
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block mb-1">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 text-black rounded"
