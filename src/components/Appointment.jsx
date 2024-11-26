@@ -53,13 +53,22 @@ export default function AppointmentBooking() {
         }),
       });
   
-      const customerData = await customerResponse.json();
-  
       if (!customerResponse.ok) {
-        // Show error if customer creation fails
-        alert('Error creating customer: ' + JSON.stringify(customerData));
+        // Handle specific error messages from the backend
+        const customerError = await customerResponse.json();
+        if (customerError.detail) {
+          alert(customerError.detail); // Show generic "Account already exists" message
+        } else {
+          // Fall back to field-specific errors
+          const errorMessage = Object.values(customerError)
+            .flat()
+            .join(', ');
+          alert('Error creating customer: ' + errorMessage);
+        }
         return;
       }
+  
+      const customerData = await customerResponse.json();
   
       // Create the appointment
       const appointmentResponse = await fetch('http://127.0.0.1:8000/api/services/appointments/', {
@@ -107,12 +116,13 @@ export default function AppointmentBooking() {
       alert('Failed to book the appointment. Please try again later.');
     }
   };
+  
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-950 text-white p-6">
       <div className="max-w-lg w-full bg-slate-900 p-8 rounded-lg shadow-lg">
         <h2 className="text-3xl font-semibold mb-6 text-center">Book an Appointment</h2>
-        
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Full Name */}
           <div>

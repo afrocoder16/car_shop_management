@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'mechanic',
     'service',
     'rest_framework',
-    'corsheaders',  
+    'corsheaders',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,16 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 
 ROOT_URLCONF = 'car_shop_project.urls'
 

@@ -24,7 +24,7 @@ const Login = () => {
         <div style={styles.page}>
             <div style={styles.row}>
                 <div style={styles.infoSection}>
-                    <p>IT'S TIME TO GET YOUR CAR</p>
+                    <p>ITS TIME TO GET YOUR CAR</p>
                     <h1 className='uppercase font-semibold text-4xl sm:text-5xl md:text-6xl lg:text-7xl'>
                         Serviced<span className='text-blue-400'> Right</span>
                     </h1>
