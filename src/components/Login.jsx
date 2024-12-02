@@ -7,39 +7,11 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Use React Router navigation
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Basic validation
-        if (!email || !password) {
-            setError('Please enter both email and password.');
-            return;
-        }
-
-        setError('');
-        try {
-            // Login API call
-            const response = await fetch('http://127.0.0.1:8000/api/customers/login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: email, password }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.token); // Save token to localStorage
-                alert('Login successful!');
-                navigate('/'); // Redirect to homepage after login
-            } else {
-                const errorData = await response.json();
-                setError(errorData.error || 'Invalid credentials.');
-            }
-        } catch (err) {
-            setError('An error occurred. Please try again later.');
-        }
+    const handleSubmit =  () => {
+        // Simulate redirection to Dashboard for now
+        navigate('/Dashboard');
     };
+    
 
     const handleSignUpRedirect = () => {
         navigate('/Signup'); // Redirect to signup page
