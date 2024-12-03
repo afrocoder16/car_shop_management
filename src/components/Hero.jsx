@@ -9,7 +9,7 @@ export default function Hero() {
   
     const handleSubmit = () => {
       // Perform some action and then navigate
-      navigate("/appointments");
+      navigate("/login");
     };
   return (
     <div className='min-h-screen flex flex-col gap-10 items-center justify-center text-center max-w-[800px] w-full mx-auto p-4'>
@@ -25,9 +25,10 @@ export default function Hero() {
       </p>
       <button
         onClick={handleSubmit}
-        className='px-8 py-4 rounded-md border-[2px] bg-slate-950 border-blue-400 border-solid blueShadow'
-      >
+        className='px-8 py-4 rounded-md border-[2px] bg-slate-950 border-blue-400 border-solid blueShadow'>
+
         <p>Book Your Service</p>
+
       </button>
     </div>
   );

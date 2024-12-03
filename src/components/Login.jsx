@@ -24,14 +24,14 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: email, password }),
+                body: JSON.stringify({ email, password }),
             });
 
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem('token', data.token); // Save token to localStorage
                 alert('Login successful!');
-                navigate('/'); // Redirect to homepage after login
+                navigate('/appointments'); // Redirect to Appointment page after login
             } else {
                 const errorData = await response.json();
                 setError(errorData.error || 'Invalid credentials.');

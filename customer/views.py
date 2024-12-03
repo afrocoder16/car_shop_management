@@ -4,10 +4,12 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Customer
-from .serializers import CustomerSerializer
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils import timezone
+from .models import Customer, Appointment, Payment
+from .serializers import CustomerSerializer, AppointmentSerializer, PaymentSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -30,7 +32,6 @@ def create_or_get_customer(request):
     vin_number = request.data.get('vin_number')
     license_plate = request.data.get('license_plate')
 
-    # Check if the customer already exists by email, VIN, or license plate
     existing_customer = Customer.objects.filter(
         email=email
     ).first() or Customer.objects.filter(
@@ -45,14 +46,10 @@ def create_or_get_customer(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Create a new customer
     serializer = CustomerSerializer(data=request.data)
     if serializer.is_valid():
         customer = serializer.save()
-
-        # Send an email confirmation for local testing
         send_account_creation_email(customer.email, customer.name)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -67,35 +64,35 @@ def sign_up(request):
     email = request.data.get('email')
     password = request.data.get('password')
 
-    # Check if the username or email already exists
     if User.objects.filter(username=username).exists():
         return Response({"detail": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
     if User.objects.filter(email=email).exists():
         return Response({"detail": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create the user
     user = User.objects.create_user(username=username, email=email, password=password)
     token, _ = Token.objects.get_or_create(user=user)
-
-    # Optionally, link the User to a Customer record (if needed)
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
 def login(request):
     """
-    Authenticates a user and returns their token.
+    Logs in a user using email and password.
     """
-    username = request.data.get('username')
+    email = request.data.get('email')
     password = request.data.get('password')
 
-    user = authenticate(username=username, password=password)
-    if user:
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if user.check_password(password):
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -106,8 +103,7 @@ def logout(request):
     if request.auth:
         request.auth.delete()
         return Response({"detail": "Logged out successfully."}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "You are not logged in."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"error": "You are not logged in."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -152,6 +148,97 @@ def send_account_creation_email(user_email, user_name):
         subject,
         message,
         from_email,
-        [user_email],  # Recipient's email
+        [user_email],
         fail_silently=False,
     )
+
+
+@api_view(['GET'])
+def get_customer_name(request):
+    """
+    Fetch and return the authenticated customer's name and email.
+    """
+    user = request.user
+    if user.is_authenticated:
+        return Response({"name": user.first_name, "email": user.email}, status=200)
+    return Response({"detail": "Authentication required."}, status=401)
+
+
+@api_view(['GET'])
+def get_upcoming_appointments(request):
+    """
+    Fetch and return upcoming appointments for the authenticated customer.
+    """
+    user = request.user
+    if not user.is_authenticated:
+        return Response({"detail": "Authentication required."}, status=401)
+
+    customer = Customer.objects.get(user=user)
+    upcoming_appointments = Appointment.objects.filter(
+        customer=customer,
+        appointment_date__gte=timezone.now()
+    ).order_by('appointment_date')
+
+    serializer = AppointmentSerializer(upcoming_appointments, many=True)
+    return Response(serializer.data, status=200)
+
+
+@api_view(['GET'])
+def get_payment_summary(request):
+    """
+    Fetch payment history and summary for the authenticated customer.
+    """
+    user = request.user
+    if not user.is_authenticated:
+        return Response({"detail": "Authentication required."}, status=401)
+
+    customer = Customer.objects.get(user=user)
+    payments = Payment.objects.filter(customer=customer).order_by('-payment_date')
+
+    total_payments = payments.aggregate(total=models.Sum('amount'))['total'] or 0
+    last_payment = payments.first()
+    average_payment = payments.aggregate(avg=models.Avg('amount'))['avg'] or 0
+
+    payment_summary = {
+        "total_payments": total_payments,
+        "last_payment": last_payment.amount if last_payment else None,
+        "last_payment_date": last_payment.payment_date if last_payment else None,
+        "average_payment": average_payment,
+    }
+
+    serializer = PaymentSerializer(payments, many=True)
+    return Response({"payments": serializer.data, "summary": payment_summary}, status=200)
+
+
+@api_view(['GET'])
+def get_service_history(request):
+    """
+    Fetch and return the car service history for the authenticated customer.
+    """
+    user = request.user
+    if not user.is_authenticated:
+        return Response({"detail": "Authentication required."}, status=401)
+
+    customer = Customer.objects.get(user=user)
+    service_history = Appointment.objects.filter(
+        customer=customer
+    ).order_by('-appointment_date')
+
+    serializer = AppointmentSerializer(service_history, many=True)
+    return Response(serializer.data, status=200)
+
+@api_view(['GET'])
+def get_past_payments(request):
+    """
+    Fetches past payments for the logged-in customer.
+    """
+    if not request.user.is_authenticated:
+        return Response({"detail": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    try:
+        customer = Customer.objects.get(user=request.user)
+        payments = Payment.objects.filter(customer=customer)
+        serializer = PaymentSerializer(payments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
