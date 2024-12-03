@@ -6,6 +6,10 @@ from .views import (
     sign_up,
     login,
     logout,
+    get_customer_name,  # Correct function name
+    get_upcoming_appointments,  # Correct function name
+    get_past_payments,  # Correct function name
+    get_service_history,  # Correct function name
 )
 
 # Default Router for CustomerViewSet
@@ -21,4 +25,10 @@ urlpatterns = [
     path('sign-up/', sign_up, name='sign_up'),
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
+
+    # Customer dashboard-related endpoints
+    path('customer-name/', get_customer_name, name='customer_name'),  # Corrected function
+    path('upcoming-appointments/', get_upcoming_appointments, name='upcoming_appointments'),  # Corrected function
+    path('past-payments/', get_past_payments, name='past_payments'),  # Corrected function
+    path('car-service-history/', get_service_history, name='car_service_history'),  # Corrected function
 ]
