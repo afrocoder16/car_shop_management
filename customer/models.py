@@ -27,29 +27,30 @@ class Customer(models.Model):
 
 class Appointment(models.Model):
     """
-    Tracks appointments for customers.
+    Tracks appointments for car services.
     """
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    appointment_date = models.DateField()
-    appointment_time = models.TimeField()
-    service_type = models.CharField(max_length=100)  # Example: Oil Change, Tire Rotation
-    notes = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=50, choices=[
-        ('Pending', 'Pending'),
-        ('In Progress', 'In Progress'),
-        ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled')
-    ], default='Pending')
+    appointment_date = models.DateField()  # Date the appointment is scheduled
+    customer = models.ForeignKey(
+        'customer.Customer',  # Use a string reference instead of importing the model
+        on_delete=models.CASCADE,
+        related_name='appointments'
+    )
+    service_type = models.ForeignKey(
+        'service.ServiceType',  # Use a string reference to avoid circular import
+        on_delete=models.CASCADE,
+        related_name='appointments'
+    )
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed'), ('Cancelled', 'Cancelled')])
 
     def __str__(self):
-        return f"Appointment for {self.customer.name} on {self.appointment_date}"
+        return f"Appointment on {self.appointment_date} for {self.customer.name}"
 
 
 class Payment(models.Model):
     """
     Tracks payments made by customers.
     """
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='customer_payments')
     payment_date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50, choices=[
@@ -64,12 +65,13 @@ class Payment(models.Model):
         return f"Payment of {self.amount} by {self.customer.name}"
 
 
+
 class Notification(models.Model):
     """
     Notification Model for sending notifications to customers.
     """
     message = models.TextField()
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='notifications')
     send_date = models.DateTimeField(auto_now_add=True)
     notification_type = models.CharField(max_length=20, choices=[('Email', 'Email'), ('SMS', 'SMS')])
 
