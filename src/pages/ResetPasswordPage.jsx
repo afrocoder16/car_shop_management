@@ -1,15 +1,14 @@
 import React from 'react';
 import Generator from '../components/Generator';
 import Footer from '../components/Footer';
-import Login from '../components/Login' ;
-import Appointemntpage from '../components/Appointment' ;
+import ResetPassword from '../components/ResetPassword';
 
 
 function Homepage() {
   return (
     <main >
       <Generator />
-       <Login />
+       <ResetPassword/>
        <Footer />
     </main>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function AppointmentBooking() {
   const [formData, setFormData] = useState({
@@ -21,6 +21,18 @@ export default function AppointmentBooking() {
     notes: '',
   });
 
+  const [authToken, setAuthToken] = useState('');
+
+  // Fetch the authentication token from local storage when the component mounts
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthToken(token);
+    } else {
+      alert('You must be logged in to book an appointment.');
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -28,13 +40,19 @@ export default function AppointmentBooking() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    if (!authToken) {
+      alert('Authentication is required. Please log in.');
+      return;
+    }
+
     try {
-      // Create or find the customer
+      // Create or retrieve the customer
       const customerResponse = await fetch('http://127.0.0.1:8000/api/customers/customers/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Token ${authToken}`,
         },
         body: JSON.stringify({
           name: formData.name,
@@ -52,29 +70,26 @@ export default function AppointmentBooking() {
           emergency_contact: formData.emergency_contact,
         }),
       });
-  
+
       if (!customerResponse.ok) {
-        // Handle specific error messages from the backend
         const customerError = await customerResponse.json();
-        if (customerError.detail) {
-          alert(customerError.detail); // Show generic "Account already exists" message
-        } else {
-          // Fall back to field-specific errors
-          const errorMessage = Object.values(customerError)
-            .flat()
-            .join(', ');
-          alert('Error creating customer: ' + errorMessage);
+        if (customerError.detail === 'Account already exists. Please sign in.') {
+          alert('Account already exists. Please log in to continue.');
+          return;
         }
+        const errorMessage = Object.values(customerError).flat().join(', ');
+        alert('Error creating customer: ' + errorMessage);
         return;
       }
-  
+
       const customerData = await customerResponse.json();
-  
+
       // Create the appointment
       const appointmentResponse = await fetch('http://127.0.0.1:8000/api/services/appointments/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Token ${authToken}`,
         },
         body: JSON.stringify({
           customer: customerData.id,
@@ -85,7 +100,7 @@ export default function AppointmentBooking() {
           status: 'Pending',
         }),
       });
-  
+
       if (appointmentResponse.ok) {
         alert('Your appointment has been booked successfully!');
         setFormData({
@@ -116,7 +131,6 @@ export default function AppointmentBooking() {
       alert('Failed to book the appointment. Please try again later.');
     }
   };
-  
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-950 text-white p-6">

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Signup = () => {
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Use React Router navigation
 
@@ -11,58 +13,67 @@ const Login = () => {
         e.preventDefault();
 
         // Basic validation
-        if (!email || !password) {
-            setError('Please enter both email and password.');
+        if (!email || !username || !password || !confirmPassword) {
+            setError('Please fill in all fields.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
             return;
         }
 
         setError('');
         try {
-            // Login API call
-            const response = await fetch('http://127.0.0.1:8000/api/customers/login/', {
+            // Signup API call
+            const response = await fetch('http://127.0.0.1:8000/api/customers/sign-up/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ username, email, password }),
             });
 
             if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.token); // Save token to localStorage
-                alert('Login successful!');
-                navigate('/Dashboard'); // Redirect to Appointment page after login
+                alert('Account created successfully! Please log in.');
+                navigate('/Login'); // Redirect to login page after signup
             } else {
                 const errorData = await response.json();
-                setError(errorData.error || 'Invalid credentials.');
+                setError(errorData.detail || 'An error occurred during signup.');
             }
         } catch (err) {
             setError('An error occurred. Please try again later.');
         }
     };
-    
 
-    const handleSignUpRedirect = () => {
-        navigate('/Signup'); // Redirect to signup page
-    };
-
-    const handleResetPassword = () => {
-        navigate('/ResetPassword'); // Redirect to reset password page
+    const handleLoginRedirect = () => {
+        navigate('/Login'); // Redirect to login page
     };
 
     return (
         <div style={styles.page}>
             <div style={styles.row}>
                 <div style={styles.infoSection}>
-                    <p>IT'S TIME TO GET YOUR CAR</p>
+                    <p>JOIN OUR PLATFORM</p>
                     <h1 className="uppercase font-semibold text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
                         Serviced<span className="text-blue-400"> Right</span>
                     </h1>
                 </div>
                 <div style={styles.container}>
-                    <h2 style={styles.header}>Login</h2>
+                    <h2 style={styles.header}>Sign Up</h2>
                     <form onSubmit={handleSubmit} style={styles.form}>
                         {error && <p style={styles.error}>{error}</p>}
+                        <div style={styles.inputGroup}>
+                            <label htmlFor="username" style={styles.label}>Username:</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                style={styles.input}
+                            />
+                        </div>
                         <div style={styles.inputGroup}>
                             <label htmlFor="email" style={styles.label}>Email:</label>
                             <input
@@ -85,21 +96,25 @@ const Login = () => {
                                 style={styles.input}
                             />
                         </div>
+                        <div style={styles.inputGroup}>
+                            <label htmlFor="confirmPassword" style={styles.label}>Confirm Password:</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                style={styles.input}
+                            />
+                        </div>
                         <div style={styles.buttonGroup}>
-                            <button type="submit" style={styles.button}>Login</button>
+                            <button type="submit" style={styles.button}>Sign Up</button>
                             <button
                                 type="button"
-                                onClick={handleSignUpRedirect}
+                                onClick={handleLoginRedirect}
                                 style={styles.button}
                             >
-                                Sign Up
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleResetPassword}
-                                style={styles.button}
-                            >
-                                Reset Password
+                                Login
                             </button>
                         </div>
                     </form>
@@ -180,4 +195,4 @@ const styles = {
     },
 };
 
-export default Login;
+export default Signup;

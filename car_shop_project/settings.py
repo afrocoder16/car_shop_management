@@ -64,10 +64,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    'DEFAULT_PERMISSION_CLASSES': [],  # Leave this empty or use 'AllowAny'
 }
+
+# Email backend for saving emails to a file (local testing)
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = 'car_shop_management/tmp/emails'  
+
 
 
 ROOT_URLCONF = 'car_shop_project.urls'
@@ -100,7 +103,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 
 # Password validation

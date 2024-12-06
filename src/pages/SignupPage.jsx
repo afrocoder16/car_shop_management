@@ -1,15 +1,14 @@
 import React from 'react';
 import Generator from '../components/Generator';
 import Footer from '../components/Footer';
-import Login from '../components/Login' ;
-import Appointemntpage from '../components/Appointment' ;
+import Signup from '../components/Signup' ;
 
 
 function Homepage() {
   return (
     <main >
       <Generator />
-       <Login />
+       <Signup />
        <Footer />
     </main>
   );
