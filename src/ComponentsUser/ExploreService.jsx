@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const ExploreService = () => {
@@ -18,9 +19,11 @@ const ExploreService = () => {
   // Example services
   const services = [
     "Oil Change",
-    "Brake Inspection",
+    "Brake Repair",
     "Wheel Alignment",
     "Transmission Service",
+    "AC Service",
+    "Tire Replacement",
   ];
 
   // State to manage selected car, service, date, and additional notes
@@ -46,7 +49,7 @@ const ExploreService = () => {
     console.log("Service Requested:", requestData);
 
     alert(
-      `Your ${selectedService || "selected"} service has been scheduled for ${selectedDate}. You can add more services if needed.`
+      `Your ${selectedService || "selected"} service has been scheduled for ${selectedDate}.`
     );
 
     // Reset form for additional services
@@ -58,21 +61,32 @@ const ExploreService = () => {
 
   // Navigate back to the dashboard
   const handleBack = () => {
-    navigate("/");
+    navigate("/Dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <div className="max-w-3xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8"
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-3xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg"
+      >
         {/* Header */}
         <h1 className="text-4xl font-bold mb-6 text-center">
-          Quick Service: {preSelectedServiceType || "Explore"}
+          Quick Service:{" "}
+          <span className="text-blue-400">{preSelectedServiceType || "Explore"}</span>
         </h1>
 
         {/* Service Form */}
         <form className="space-y-6">
           {/* Select Service */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }} className="mb-4">
             <label htmlFor="service" className="block text-lg font-semibold mb-2">
               Select Service (Optional)
             </label>
@@ -89,10 +103,10 @@ const ExploreService = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </motion.div>
 
           {/* Select Car */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }} className="mb-4">
             <label htmlFor="car" className="block text-lg font-semibold mb-2">
               Select Your Car
             </label>
@@ -109,10 +123,10 @@ const ExploreService = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </motion.div>
 
           {/* Select Date */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }} className="mb-4">
             <label htmlFor="date" className="block text-lg font-semibold mb-2">
               Choose a Date
             </label>
@@ -123,10 +137,10 @@ const ExploreService = () => {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </motion.div>
 
           {/* Additional Notes */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }} className="mb-4">
             <label htmlFor="notes" className="block text-lg font-semibold mb-2">
               Additional Notes (Optional)
             </label>
@@ -138,28 +152,32 @@ const ExploreService = () => {
               rows="4"
               placeholder="Any specific requests or information about the service?"
             ></textarea>
-          </div>
+          </motion.div>
 
           {/* Buttons */}
           <div className="flex justify-between">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={handleBack}
               className="bg-gray-600 hover:bg-gray-500 text-white py-3 px-6 rounded-md font-bold transition duration-200"
             >
               Back to Dashboard
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={handleServiceRequest}
               className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md font-bold transition duration-200"
             >
               Confirm Service
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -20,17 +20,17 @@ const MechanicManagement = () => {
     { id: 3, name: "Tom Brown", email: "tombrown@example.com", phone: "555-123-4567", expertise: "Electrical Systems" },
   ];
 
-  // Fetch mechanics when the component loads (using example data here)
+  // Fetch mechanics when the component loads
   useEffect(() => {
-    setMechanics(exampleMechanics); // Simulating a fetch request with example data
+    setMechanics(exampleMechanics);
   }, []);
 
   // Add a new mechanic
-  const handleAddMechanic = async (e) => {
+  const handleAddMechanic = (e) => {
     e.preventDefault();
-    const newMechanicData = { ...newMechanic, id: mechanics.length + 1 }; // Give new mechanic a unique ID
+    const newMechanicData = { ...newMechanic, id: mechanics.length + 1 };
     setMechanics([...mechanics, newMechanicData]);
-    setNewMechanic({ name: "", email: "", phone: "", expertise: "" }); // Reset the form
+    setNewMechanic({ name: "", email: "", phone: "", expertise: "" });
   };
 
   // Remove a mechanic
@@ -39,7 +39,7 @@ const MechanicManagement = () => {
   };
 
   // Edit a mechanic
-  const handleEditMechanic = async (e) => {
+  const handleEditMechanic = (e) => {
     e.preventDefault();
     const updatedMechanic = { ...selectedMechanic };
     setMechanics(
@@ -52,24 +52,32 @@ const MechanicManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 text-white p-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
       {/* Back Button */}
       <button
         onClick={() => navigate("/owner-dashboard")}
-        className="text-blue-400 hover:text-white mb-4 text-lg"
+        className="mb-6 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
       >
         &larr; Back to Owner Dashboard
       </button>
 
       <div className="max-w-6xl mx-auto bg-gray-700 p-8 rounded-lg shadow-md">
         {/* Header */}
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">Mechanic Management</h2>
+        <h2 className="text-4xl font-bold mb-8 text-center text-white">
+          Mechanic Management
+        </h2>
 
         {/* Add/Edit Mechanic Form */}
-        <form onSubmit={editMode ? handleEditMechanic : handleAddMechanic} className="bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+        <form
+          onSubmit={editMode ? handleEditMechanic : handleAddMechanic}
+          className="bg-gray-800 p-6 rounded-lg shadow-md mb-8"
+        >
+          <h3 className="text-2xl font-semibold mb-6 text-center text-blue-400">
+            {editMode ? "Edit Mechanic" : "Add a New Mechanic"}
+          </h3>
           <div className="space-y-4">
             <div>
-              <label className="text-lg">Name</label>
+              <label className="block text-lg mb-2">Name</label>
               <input
                 type="text"
                 value={editMode ? selectedMechanic?.name : newMechanic.name}
@@ -79,11 +87,11 @@ const MechanicManagement = () => {
                     : setNewMechanic({ ...newMechanic, name: e.target.value })
                 }
                 required
-                className="w-full p-3 rounded-md bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="text-lg">Email</label>
+              <label className="block text-lg mb-2">Email</label>
               <input
                 type="email"
                 value={editMode ? selectedMechanic?.email : newMechanic.email}
@@ -93,11 +101,11 @@ const MechanicManagement = () => {
                     : setNewMechanic({ ...newMechanic, email: e.target.value })
                 }
                 required
-                className="w-full p-3 rounded-md bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="text-lg">Phone</label>
+              <label className="block text-lg mb-2">Phone</label>
               <input
                 type="text"
                 value={editMode ? selectedMechanic?.phone : newMechanic.phone}
@@ -107,11 +115,11 @@ const MechanicManagement = () => {
                     : setNewMechanic({ ...newMechanic, phone: e.target.value })
                 }
                 required
-                className="w-full p-3 rounded-md bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="text-lg">Expertise</label>
+              <label className="block text-lg mb-2">Expertise</label>
               <input
                 type="text"
                 value={editMode ? selectedMechanic?.expertise : newMechanic.expertise}
@@ -121,7 +129,7 @@ const MechanicManagement = () => {
                     : setNewMechanic({ ...newMechanic, expertise: e.target.value })
                 }
                 required
-                className="w-full p-3 rounded-md bg-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex space-x-4">
@@ -135,7 +143,7 @@ const MechanicManagement = () => {
                 <button
                   type="button"
                   onClick={() => setEditMode(false)}
-                  className="w-1/2 p-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-300"
+                  className="w-1/2 p-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-300"
                 >
                   Cancel
                 </button>
@@ -146,12 +154,16 @@ const MechanicManagement = () => {
 
         {/* Mechanics List */}
         <div>
-          <h3 className="text-xl font-semibold mb-4 text-center text-blue-300">Current Mechanics</h3>
+          <h3 className="text-2xl font-semibold mb-6 text-center text-white">
+            Current Mechanics
+          </h3>
           <div className="space-y-4">
-            {mechanics.map((mechanic) => (
+            {mechanics.map((mechanic, index) => (
               <div
                 key={mechanic.id}
-                className="bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center"
+                className={`p-4 rounded-lg shadow-md flex justify-between items-center ${
+                  index % 2 === 0 ? "bg-gray-800" : "bg-gray-700"
+                }`}
               >
                 <div>
                   <p>
@@ -167,13 +179,13 @@ const MechanicManagement = () => {
                       setEditMode(true);
                       setSelectedMechanic(mechanic);
                     }}
-                    className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition duration-300"
+                    className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleRemoveMechanic(mechanic.id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300"
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
                   >
                     Remove
                   </button>

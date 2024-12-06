@@ -15,6 +15,7 @@ import Profile from "./ComponentsUser/Profile";
 import Settings from "./ComponentsUser/Settings";
 import ExploreService from "./ComponentsUser/ExploreService";
 import ManageCars from "./ComponentsUser/ManageCars";
+import RecentRepairs from "./ComponentsUser/RecentRepairs"; // Import the new page
 
 // Owner Dashboard and Pages
 import OwnerDashboard from "./pages/OwnerDashboard";
@@ -54,6 +55,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/explore-service" element={<ExploreService />} />
         <Route path="/manage-cars" element={<ManageCars />} /> {/* User's Manage Cars */}
+        <Route path="/recent-repairs" element={<RecentRepairs />} /> {/* Recent Repairs Page */}
         {/* Owner Dashboard and Pages */}
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         <Route path="/manage-cars-owner" element={<ManageCarsOwner />} /> {/* Owner's Manage Cars */}
@@ -78,4 +80,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
@@ -23,14 +24,24 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8 flex justify-center items-center">
-      <div className="max-w-3xl w-full bg-gray-700 p-10 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-8 text-center">Settings</h1>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8 flex justify-center items-center"
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-3xl w-full bg-gray-700 p-10 rounded-lg shadow-lg"
+      >
+        <h1 className="text-4xl font-bold mb-8 text-center text-blue-400">Settings</h1>
 
         {/* Form */}
         <form className="space-y-6">
           {/* Username */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }}>
             <label htmlFor="username" className="block font-semibold mb-2">
               Username
             </label>
@@ -41,10 +52,10 @@ const Settings = () => {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </motion.div>
 
           {/* Email */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }}>
             <label htmlFor="email" className="block font-semibold mb-2">
               Email
             </label>
@@ -55,10 +66,10 @@ const Settings = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </motion.div>
 
           {/* Password */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }}>
             <label htmlFor="password" className="block font-semibold mb-2">
               Password
             </label>
@@ -70,10 +81,10 @@ const Settings = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </motion.div>
 
           {/* Notifications */}
-          <div className="flex items-center">
+          <motion.div whileHover={{ scale: 1.02 }} className="flex items-center">
             <input
               type="checkbox"
               id="notifications"
@@ -84,10 +95,10 @@ const Settings = () => {
             <label htmlFor="notifications" className="ml-3 font-semibold">
               Enable Notifications
             </label>
-          </div>
+          </motion.div>
 
           {/* Theme */}
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }}>
             <label htmlFor="theme" className="block font-semibold mb-2">
               Theme
             </label>
@@ -100,28 +111,32 @@ const Settings = () => {
               <option>Light</option>
               <option>Dark</option>
             </select>
-          </div>
+          </motion.div>
 
           {/* Save Button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
             onClick={handleSaveChanges}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md"
           >
             Save Changes
-          </button>
+          </motion.button>
 
           {/* Back Button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/Dashboard")}
             className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 rounded-md mt-4"
           >
             Back to Dashboard
-          </button>
+          </motion.button>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

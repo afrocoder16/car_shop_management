@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const WorkHistory = () => {
   const [tasks, setTasks] = useState([]);
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate(); // Navigation hook
+  const navigate = useNavigate();
 
   // Fetch work history when the component loads
   useEffect(() => {
@@ -32,18 +33,40 @@ const WorkHistory = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Navigate back to Mechanic Dashboard
+  // Navigate back to Mechanics Dashboard
   const handleBackToDashboard = () => {
     navigate("/mechanics-dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <div className="max-w-6xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-center mb-8">Work History</h1>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8"
+    >
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-6xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg"
+      >
+        <motion.h1
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl font-bold text-center mb-8 text-gradient bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text"
+        >
+          Work History
+        </motion.h1>
 
         {/* Search and Filter */}
-        <div className="flex justify-between mb-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+          className="flex justify-between mb-6"
+        >
           <div className="flex gap-4">
             <input
               type="text"
@@ -62,16 +85,15 @@ const WorkHistory = () => {
               <option value="In Progress">In Progress</option>
             </select>
           </div>
-
-          <div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md">
-              Filter Tasks
-            </button>
-          </div>
-        </div>
+        </motion.div>
 
         {/* Task History Table */}
-        <div className="overflow-x-auto">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="overflow-x-auto"
+        >
           <table className="w-full table-auto text-left text-sm">
             <thead>
               <tr className="bg-gray-800 text-gray-300">
@@ -84,8 +106,9 @@ const WorkHistory = () => {
             </thead>
             <tbody>
               {filteredTasks.map((task) => (
-                <tr
+                <motion.tr
                   key={task.id}
+                  whileHover={{ scale: 1.02 }}
                   className="border-t border-gray-700 hover:bg-gray-600 transition duration-200"
                 >
                   <td className="p-4">{task.car}</td>
@@ -109,7 +132,7 @@ const WorkHistory = () => {
                       ? new Date(task.completionDate).toLocaleString()
                       : "N/A"}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
               {filteredTasks.length === 0 && (
                 <tr>
@@ -120,19 +143,25 @@ const WorkHistory = () => {
               )}
             </tbody>
           </table>
-        </div>
+        </motion.div>
 
         {/* Back to Dashboard Button */}
-        <div className="mt-6 text-center">
-          <button
+        <motion.div
+          initial={{ y: 50 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mt-6 text-center"
+        >
+          <motion.button
+            whileHover={{ scale: 1.1 }}
             onClick={handleBackToDashboard}
-            className="bg-gray-600 hover:bg-gray-500 text-white py-3 px-6 rounded-md font-bold"
+            className="bg-gray-600 hover:bg-gray-500 text-white py-3 px-6 rounded-md font-bold shadow-lg transition"
           >
             Back to Mechanics Dashboard
-          </button>
-        </div>
-      </div>
-    </div>
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

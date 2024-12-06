@@ -1,50 +1,11 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import TaskAssignmentForm from "../ComponentsOwner/TaskAssignmentForm";
-import CarProgressTable from "../ComponentsOwner/CarProgressTable";
-import Notifications from "../ComponentsOwner/Notifications";
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
-  const [mechanics] = useState([
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-  ]);
   const [notifications, setNotifications] = useState([]);
-
-  // Function to handle new task submission
-  const handleTaskSubmit = (task) => {
-    const newTask = {
-      ...task,
-      id: tasks.length + 1,
-      status: "Pending",
-    };
-    setTasks((prevTasks) => [...prevTasks, newTask]);
-
-    // Create a notification for the new task assignment
-    addNotification(`New task assigned for ${task.car}: ${task.serviceType}`);
-  };
-
-  // Function to handle task status updates
-  const updateTaskStatus = (taskId, status) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, status } : task
-      )
-    );
-
-    const task = tasks.find((t) => t.id === taskId);
-    addNotification(`Task for ${task?.car} marked as ${status}`);
-  };
-
-  // Function to handle task deletion
-  const handleTaskDelete = (taskId) => {
-    const taskToDelete = tasks.find((task) => task.id === taskId);
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
-
-    addNotification(`Task for ${taskToDelete?.car} deleted.`);
-  };
 
   // Function to add a notification
   const addNotification = (message) => {
@@ -59,124 +20,138 @@ const OwnerDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
-      {/* Sidebar for Navigation */}
-      <div className="bg-gray-800 w-1/5 p-6 shadow-md">
-        <h2 className="text-2xl font-bold text-white mb-6">Owner Panel</h2>
-        <ul className="space-y-4">
-          <li>
-            <button
-              onClick={() => navigate("/owner-dashboard")}
-              className="text-blue-400 hover:text-white transition duration-300"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex min-h-screen bg-gradient-to-b from-gray-900 to-gray-800"
+    >
+      {/* Sidebar */}
+      <motion.div
+        initial={{ x: -200 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-800 w-1/5 p-6 shadow-lg flex flex-col"
+      >
+        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+          Owner Panel
+        </h2>
+        <ul className="space-y-6">
+          {[
+            { name: "Dashboard", path: "/owner-dashboard" },
+            { name: "Manage Cars", path: "/manage-cars-owner" },
+            { name: "Statistics", path: "/statistics-cards" },
+            { name: "Task Assignment", path: "/task-assignment" },
+            { name: "Task List", path: "/task-list" },
+            { name: "Car Progress", path: "/car-progress-table" },
+            { name: "Mechanic Management", path: "/mechanic-management" },
+            { name: "Notifications", path: "/owner-notifications" },
+          ].map((item, index) => (
+            <motion.li
+              whileHover={{ scale: 1.05 }}
+              key={index}
+              className="text-lg font-semibold text-gray-300 hover:text-white cursor-pointer transition duration-300"
+              onClick={() => navigate(item.path)}
             >
-              Dashboard
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/manage-cars-owner")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Manage Cars
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/statistics-cards")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Statistics Cards
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/task-assignment")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Task Assignment
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/task-list")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Task List
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/car-progress-table")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Car Progress
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/mechanic-management")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Mechanic Management
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => navigate("/owner-notifications")}
-              className="text-blue-400 hover:text-white transition duration-300"
-            >
-              Notifications
-            </button>
-          </li>
+              {item.name}
+            </motion.li>
+          ))}
         </ul>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-gradient-to-b from-gray-800 to-gray-900 text-white p-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="flex-1 p-10">
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-6xl mx-auto"
+        >
           {/* Header */}
-          <h1 className="text-4xl font-bold mb-8 text-center text-white">
+          <h1 className="text-5xl font-bold mb-8 text-center text-gray-100">
             Owner Dashboard
           </h1>
 
-          {/* Dashboard Widgets */}
-          <div className="flex justify-between gap-6 mb-8">
+          {/* Widgets Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Task Assignment */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md w-1/2">
-              <h2 className="text-xl font-semibold text-white mb-4">Assign Tasks</h2>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="bg-gray-700 p-6 rounded-lg shadow-md"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-center text-gray-200">
+                Assign Tasks
+              </h2>
               <button
                 onClick={() => navigate("/task-assignment")}
-                className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 font-bold"
               >
                 Go to Task Assignment
               </button>
-            </div>
+            </motion.div>
 
             {/* Car Progress */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md w-1/2">
-              <h2 className="text-xl font-semibold text-white mb-4">Car Progress</h2>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="bg-gray-700 p-6 rounded-lg shadow-md"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-center text-gray-200">
+                Car Progress
+              </h2>
               <button
                 onClick={() => navigate("/car-progress-table")}
-                className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 font-bold"
               >
                 View Car Progress
               </button>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Notifications */}
-          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-white mb-4">Notifications</h2>
+          {/* Notifications Section */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-gray-700 p-6 rounded-lg shadow-md mt-8"
+          >
+            <h2 className="text-2xl font-semibold mb-4 text-center text-gray-200">
+              Notifications
+            </h2>
             <button
               onClick={() => navigate("/owner-notifications")}
-              className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+              className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 font-bold"
             >
               View Notifications
             </button>
+          </motion.div>
+
+          {/* Recent Notifications */}
+          <div className="bg-gray-700 p-6 rounded-lg shadow-md mt-8">
+            <h2 className="text-2xl font-semibold mb-4 text-center text-gray-200">
+              Recent Activity
+            </h2>
+            {notifications.length > 0 ? (
+              <ul className="space-y-4 max-h-48 overflow-y-auto">
+                {notifications.map((notification) => (
+                  <motion.li
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    key={notification.id}
+                    className="bg-gray-800 p-4 rounded-md shadow-sm border border-gray-600"
+                  >
+                    <p className="text-gray-200">{notification.message}</p>
+                    <span className="text-sm text-gray-400">
+                      {notification.date}
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-center text-gray-400">No notifications yet.</p>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

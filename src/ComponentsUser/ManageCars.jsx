@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const ManageCars = () => {
@@ -64,21 +65,33 @@ const ManageCars = () => {
 
   // Handle back navigation
   const handleBack = () => {
-    navigate("/");
+    navigate("/Dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <div className="max-w-4xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8"
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl mx-auto bg-gray-700 p-10 rounded-lg shadow-lg"
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Manage Cars</h1>
-          <button
+          <h1 className="text-4xl font-bold">Manage Cars</h1>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleBack}
-            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md"
+            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md transition duration-200"
           >
             Back to Dashboard
-          </button>
+          </motion.button>
         </div>
 
         {/* Cars List */}
@@ -87,12 +100,15 @@ const ManageCars = () => {
           {cars.length > 0 ? (
             <div className="space-y-4">
               {cars.map((car) => (
-                <div
+                <motion.div
                   key={car.id}
-                  className="bg-gray-800 p-4 rounded-md shadow-md flex justify-between items-center"
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 rounded-md shadow-md flex justify-between items-center hover:shadow-lg"
                 >
                   <div>
-                    <p>
+                    <p className="font-semibold">
                       <strong>Make:</strong> {car.make}
                     </p>
                     <p>
@@ -106,20 +122,24 @@ const ManageCars = () => {
                     </p>
                   </div>
                   <div className="flex space-x-4">
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleEditCar(car)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+                      className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200"
                     >
                       Edit
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleDeleteCar(car.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+                      className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition duration-200"
                     >
                       Delete
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           ) : (
@@ -128,7 +148,12 @@ const ManageCars = () => {
         </div>
 
         {/* Add/Edit Car Form */}
-        <div className="bg-gray-800 p-6 rounded-md shadow-md">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gray-800 p-6 rounded-md shadow-md"
+        >
           <h2 className="text-2xl font-semibold mb-4">
             {isEditing ? "Edit Car" : "Add a New Car"}
           </h2>
@@ -139,7 +164,7 @@ const ManageCars = () => {
             }}
           >
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Make</label>
+              <label className="block font-semibold mb-2">Make</label>
               <input
                 type="text"
                 name="make"
@@ -150,7 +175,7 @@ const ManageCars = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Model</label>
+              <label className="block font-semibold mb-2">Model</label>
               <input
                 type="text"
                 name="model"
@@ -161,7 +186,7 @@ const ManageCars = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">VIN</label>
+              <label className="block font-semibold mb-2">VIN</label>
               <input
                 type="text"
                 name="vin"
@@ -172,7 +197,7 @@ const ManageCars = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">License Plate</label>
+              <label className="block font-semibold mb-2">License Plate</label>
               <input
                 type="text"
                 name="plate"
@@ -183,24 +208,28 @@ const ManageCars = () => {
               />
             </div>
             <div className="flex space-x-4">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 type="submit"
                 className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md font-bold"
               >
                 {isEditing ? "Save Changes" : "Add Car"}
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={resetForm}
                 className="bg-gray-600 hover:bg-gray-500 text-white py-3 px-6 rounded-md font-bold"
               >
                 Cancel
-              </button>
+              </motion.button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

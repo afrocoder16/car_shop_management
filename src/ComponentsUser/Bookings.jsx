@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import "./CustomCalendar.css"; // Custom styles for the calendar
+import { motion } from "framer-motion";
 
 const Bookings = () => {
   const [date, setDate] = useState(new Date());
@@ -15,7 +17,7 @@ const Bookings = () => {
   ]);
 
   const handleBack = () => {
-    window.location.href = "/";
+    window.location.href = "/Dashboard";
   };
 
   const handleConfirmAppointment = () => {
@@ -42,44 +44,66 @@ const Bookings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8"
+    >
       {/* Back Button */}
-      <div className="mb-6">
+      <div>
         <button
           onClick={handleBack}
-          className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md"
+          className="bg-gray-600 hover:bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold shadow-md"
         >
           ← Back to Dashboard
         </button>
       </div>
 
       {/* Page Title */}
-      <h1 className="text-3xl font-bold text-center mb-6">Bookings</h1>
+      <h1 className="text-4xl font-extrabold text-center mt-8 mb-10">Manage Your Bookings</h1>
 
       {/* Calendar Section */}
-      <div className="bg-gray-700 p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">Book a New Appointment</h2>
-        <div className="flex justify-center mb-4">
-          <Calendar onChange={setDate} value={date} />
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-700 p-8 rounded-lg shadow-lg mb-10"
+      >
+        <h2 className="text-3xl font-bold text-center mb-6">Book a New Appointment</h2>
+        <div className="flex justify-center mb-6">
+          <Calendar
+            onChange={setDate}
+            value={date}
+            className="custom-calendar"
+          />
         </div>
-        <p className="text-center mb-4">Selected Date: <strong>{date.toDateString()}</strong></p>
-        <div className="flex justify-center">
-          <button
+        <p className="text-center text-lg">
+          Selected Date: <strong className="text-blue-400">{date.toDateString()}</strong>
+        </p>
+        <div className="flex justify-center mt-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-bold shadow-lg"
             onClick={handleConfirmAppointment}
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
           >
             Confirm Appointment
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Confirmed Appointments Section */}
-      <div className="bg-gray-700 p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">Confirmed Appointments</h2>
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-700 p-8 rounded-lg shadow-lg mb-10"
+      >
+        <h2 className="text-3xl font-bold text-center mb-6">Confirmed Appointments</h2>
         {confirmedAppointments.length > 0 ? (
           <ul className="space-y-4 max-h-72 overflow-y-auto">
             {confirmedAppointments.map((appointment, index) => (
-              <li key={index} className="bg-gray-800 p-4 rounded-lg shadow">
+              <li key={index} className="bg-gray-800 p-4 rounded-lg shadow-md">
                 <p><strong>Service:</strong> {appointment.service}</p>
                 <p><strong>Date:</strong> {appointment.date}</p>
                 <p>
@@ -95,19 +119,21 @@ const Bookings = () => {
                 </p>
                 <div className="flex space-x-4 mt-4">
                   {appointment.status === "Pending" && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
                       onClick={() => handleUpdateStatus(index, "Confirmed")}
-                      className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                      className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-semibold"
                     >
                       Mark as Confirmed
-                    </button>
+                    </motion.button>
                   )}
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
                     onClick={() => handleDeleteAppointment(index)}
-                    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+                    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-semibold"
                   >
                     Delete
-                  </button>
+                  </motion.button>
                 </div>
               </li>
             ))}
@@ -115,11 +141,16 @@ const Bookings = () => {
         ) : (
           <p className="text-center">No confirmed appointments yet!</p>
         )}
-      </div>
+      </motion.div>
 
       {/* Previous Appointments Section */}
-      <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-center mb-4">Previous Appointments</h2>
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-700 p-8 rounded-lg shadow-lg"
+      >
+        <h2 className="text-3xl font-bold text-center mb-6">Previous Appointments</h2>
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
@@ -147,8 +178,8 @@ const Bookings = () => {
             ))}
           </tbody>
         </table>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -35,24 +36,36 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center p-8">
-      <div className="bg-gray-700 text-white p-10 rounded-lg shadow-xl w-full max-w-3xl">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center p-8"
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-700 text-white p-10 rounded-lg shadow-xl w-full max-w-3xl"
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Customer Profile</h2>
-          <button
+          <h2 className="text-4xl font-bold">Customer Profile</h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate(-1)} // Navigate back
-            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md"
+            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md transition duration-200"
           >
             Go Back
-          </button>
+          </motion.button>
         </div>
 
         {/* Profile Form */}
         <form>
           {/* Full Name */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Full Name</label>
+            <label className="block font-semibold mb-2">Full Name</label>
             <input
               type="text"
               value={fullName}
@@ -63,7 +76,7 @@ const Profile = () => {
 
           {/* Phone Number */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Phone Number</label>
+            <label className="block font-semibold mb-2">Phone Number</label>
             <input
               type="text"
               value={phoneNumber}
@@ -74,7 +87,7 @@ const Profile = () => {
 
           {/* Email */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Email</label>
+            <label className="block font-semibold mb-2">Email</label>
             <input
               type="email"
               value={email}
@@ -85,18 +98,18 @@ const Profile = () => {
 
           {/* Address */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Address</label>
-            <input
-              type="text"
+            <label className="block font-semibold mb-2">Address</label>
+            <textarea
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+              rows="2"
+            ></textarea>
           </div>
 
           {/* VIN Number */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">VIN Number</label>
+            <label className="block font-semibold mb-2">VIN Number</label>
             <input
               type="text"
               value={vinNumber}
@@ -107,7 +120,7 @@ const Profile = () => {
 
           {/* License Plate */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">License Plate</label>
+            <label className="block font-semibold mb-2">License Plate</label>
             <input
               type="text"
               value={licensePlate}
@@ -118,7 +131,7 @@ const Profile = () => {
 
           {/* Emergency Contact */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Emergency Contact</label>
+            <label className="block font-semibold mb-2">Emergency Contact</label>
             <input
               type="text"
               value={emergencyContact}
@@ -127,31 +140,31 @@ const Profile = () => {
             />
           </div>
 
-          {/* Appointment Date */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-1">Appointment Date</label>
-            <input
-              type="date"
-              value={appointmentDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Appointment Time */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-1">Appointment Time</label>
-            <input
-              type="time"
-              value={appointmentTime}
-              onChange={(e) => setAppointmentTime(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Appointment Date and Time */}
+          <div className="mb-6 flex gap-4">
+            <div className="w-1/2">
+              <label className="block font-semibold mb-2">Appointment Date</label>
+              <input
+                type="date"
+                value={appointmentDate}
+                onChange={(e) => setAppointmentDate(e.target.value)}
+                className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block font-semibold mb-2">Appointment Time</label>
+              <input
+                type="time"
+                value={appointmentTime}
+                onChange={(e) => setAppointmentTime(e.target.value)}
+                className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           {/* Service Type */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Service Type</label>
+            <label className="block font-semibold mb-2">Service Type</label>
             <select
               value={serviceType}
               onChange={(e) => setServiceType(e.target.value)}
@@ -166,7 +179,7 @@ const Profile = () => {
 
           {/* Additional Notes */}
           <div className="mb-6">
-            <label className="block font-semibold mb-1">Additional Notes</label>
+            <label className="block font-semibold mb-2">Additional Notes</label>
             <textarea
               value={additionalNotes}
               onChange={(e) => setAdditionalNotes(e.target.value)}
@@ -177,16 +190,17 @@ const Profile = () => {
           </div>
 
           {/* Save Button */}
-          <button
-            type="button"
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleSave}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md font-semibold"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md font-semibold transition duration-200"
           >
             Save Changes
-          </button>
+          </motion.button>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
