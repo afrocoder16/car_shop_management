@@ -1,8 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const [userName, setUserName] = useState("User"); // Default to "User" until data is fetched
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch the user's name from the backend
+    const fetchUserName = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/customers/customer-name-display/", {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`, // Include the auth token
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user name: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setUserName(data.name || "User");
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   const navigateTo = (path) => {
     navigate(path);
@@ -68,7 +94,7 @@ const Dashboard = () => {
         <div className="flex-1">
           {/* Header */}
           <h2 className="text-4xl font-bold mb-8 text-center">
-            Welcome back, User
+            Welcome back, {userName}
           </h2>
 
           <div className="grid grid-cols-3 gap-6">
@@ -138,55 +164,6 @@ const Dashboard = () => {
             <span className="text-red-400">In Progress</span>
           </li>
         </ul>
-      </div>
-
-      {/* Explore Services */}
-      <div className="mt-6">
-        <h3 className="text-4xl font-bold mb-6 text-center">
-          Explore Our Services
-        </h3>
-        <div className="grid grid-cols-3 gap-6">
-          {/* Oil Change */}
-          <div
-            className="bg-cover bg-center h-48 rounded-md shadow-md text-center text-white flex items-center justify-center cursor-pointer"
-            style={{
-              backgroundImage: `url('/image/oil-change.jpg')`,
-            }}
-            onClick={() => navigateTo(`/explore-service?service=Oil Change`)}
-          >
-            <p className="bg-blue-900 bg-opacity-70 px-4 py-2 rounded-md">
-              Oil Change
-            </p>
-          </div>
-
-          {/* Wheel Alignment */}
-          <div
-            className="bg-cover bg-center h-48 rounded-md shadow-md text-center text-white flex items-center justify-center cursor-pointer"
-            style={{
-              backgroundImage: `url('/image/wheel-alignment.jpg')`,
-            }}
-            onClick={() => navigateTo(`/explore-service?service=Wheel Alignment`)}
-          >
-            <p className="bg-blue-900 bg-opacity-70 px-4 py-2 rounded-md">
-              Wheel Alignment
-            </p>
-          </div>
-
-          {/* Transmission Service */}
-          <div
-            className="bg-cover bg-center h-48 rounded-md shadow-md text-center text-white flex items-center justify-center cursor-pointer"
-            style={{
-              backgroundImage: `url('/image/transmission-service.jpg')`,
-            }}
-            onClick={() =>
-              navigateTo(`/explore-service?service=Transmission Service`)
-            }
-          >
-            <p className="bg-blue-900 bg-opacity-70 px-4 py-2 rounded-md">
-              Transmission Service
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

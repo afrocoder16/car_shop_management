@@ -54,12 +54,20 @@ class Service(models.Model):
 
 class Appointment(models.Model):
     appointment_date = models.DateField()  # Date the appointment is scheduled
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)  # Customer scheduling the appointment
+    customer = models.ForeignKey(
+        Customer, 
+        on_delete=models.CASCADE, 
+        related_name="service_appointments"  # Add a unique related_name
+    )  # Customer scheduling the appointment
     service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE)  # Type of service being booked
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed'), ('Cancelled', 'Cancelled')])  # Appointment status
+    status = models.CharField(
+        max_length=20, 
+        choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed'), ('Cancelled', 'Cancelled')]
+    )  # Appointment status
 
     def __str__(self):
         return f"Appointment on {self.appointment_date} for {self.customer.name}"
+
 
 
 class Payment(models.Model):
