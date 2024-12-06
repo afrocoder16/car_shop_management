@@ -54,25 +54,31 @@ def create_or_get_customer(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def sign_up(request):
     """
     Allows new users to sign up for an account.
     """
-    username = request.data.get('username')
+    first_name = request.data.get('first_name')
+    last_name = request.data.get('last_name')
     email = request.data.get('email')
     password = request.data.get('password')
 
-    if User.objects.filter(username=username).exists():
-        return Response({"detail": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
+    # Check if the email already exists
     if User.objects.filter(email=email).exists():
         return Response({"detail": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = User.objects.create_user(username=username, email=email, password=password)
+    # Create the user
+    user = User.objects.create_user(username=email, email=email, password=password)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
+
     token, _ = Token.objects.get_or_create(user=user)
+
+    # Optionally, link the User to a Customer record (if needed)
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
+
 
 
 @api_view(['POST'])

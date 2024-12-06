@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
     const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,7 +14,7 @@ const Signup = () => {
         e.preventDefault();
 
         // Basic validation
-        if (!email || !username || !password || !confirmPassword) {
+        if (!email || !firstName || !lastName || !password || !confirmPassword) {
             setError('Please fill in all fields.');
             return;
         }
@@ -31,7 +32,7 @@ const Signup = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password }),
             });
 
             if (response.ok) {
@@ -64,13 +65,24 @@ const Signup = () => {
                     <form onSubmit={handleSubmit} style={styles.form}>
                         {error && <p style={styles.error}>{error}</p>}
                         <div style={styles.inputGroup}>
-                            <label htmlFor="username" style={styles.label}>Username:</label>
+                            <label htmlFor="firstName" style={styles.label}>First Name:</label>
                             <input
                                 type="text"
-                                id="username"
-                                name="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                id="firstName"
+                                name="firstName"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                style={styles.input}
+                            />
+                        </div>
+                        <div style={styles.inputGroup}>
+                            <label htmlFor="lastName" style={styles.label}>Last Name:</label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                                 style={styles.input}
                             />
                         </div>
