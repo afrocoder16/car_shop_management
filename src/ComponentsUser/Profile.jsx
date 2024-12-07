@@ -1,207 +1,195 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Profile = () => {
+export default function Profile() {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone_number: '',
+    email: '',
+    address: '',
+    car_make: 'Unknown',
+    car_model: 'Unknown',
+    car_year: 2000,
+    vin_number: 'Unknown',
+    license_plate: 'Unknown',
+    loyalty_points: 0,
+    membership_level: '',
+    preferred_service_time: '',
+    emergency_contact: '',
+  });
+
+  const [authToken, setAuthToken] = useState('');
   const navigate = useNavigate();
 
-  // Customer details (default values)
-  const [fullName, setFullName] = useState("John Doe");
-  const [phoneNumber, setPhoneNumber] = useState("123-456-7890");
-  const [email, setEmail] = useState("john@example.com");
-  const [address, setAddress] = useState("123 Main St, Springfield");
-  const [vinNumber, setVinNumber] = useState("Unknown");
-  const [licensePlate, setLicensePlate] = useState("Unknown");
-  const [emergencyContact, setEmergencyContact] = useState("Unknown");
-  const [appointmentDate, setAppointmentDate] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("");
-  const [serviceType, setServiceType] = useState("");
-  const [additionalNotes, setAdditionalNotes] = useState("");
+  // Fetch the authentication token from local storage when the component mounts
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthToken(token);
+    } else {
+      console.log('No authentication token found.');
+    }
+  }, []);
 
-  const handleSave = () => {
-    console.log("Profile updated:", {
-      fullName,
-      phoneNumber,
-      email,
-      address,
-      vinNumber,
-      licensePlate,
-      emergencyContact,
-      appointmentDate,
-      appointmentTime,
-      serviceType,
-      additionalNotes,
-    });
-    alert("Profile information saved!");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!authToken) {
+      console.log('Authentication token missing. Changes will not be saved to the server.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/customers/customers/', {
+        method: 'PUT', // Use PUT to update the profile
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${authToken}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert('Profile updated successfully!');
+      } else {
+        const errorData = await response.json();
+        alert('Error saving profile: ' + JSON.stringify(errorData));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to save the profile. Please try again later.');
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/dashboard'); // Adjust '/dashboard' to your actual dashboard route
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center p-8"
-    >
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="bg-gray-700 text-white p-10 rounded-lg shadow-xl w-full max-w-3xl"
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-4xl font-bold">Customer Profile</h2>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate(-1)} // Navigate back
-            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-md transition duration-200"
-          >
-            Go Back
-          </motion.button>
-        </div>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-950 text-white p-6">
+      <div className="max-w-lg w-full bg-slate-900 p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-semibold mb-6 text-center">Profile</h2>
 
-        {/* Profile Form */}
-        <form>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Full Name */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Full Name</label>
+          <div>
+            <label htmlFor="name" className="block mb-1">Full Name</label>
             <input
               type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
           {/* Phone Number */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Phone Number</label>
+          <div>
+            <label htmlFor="phone_number" className="block mb-1">Phone Number</label>
             <input
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="tel"
+              id="phone_number"
+              name="phone_number"
+              value={formData.phone_number}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
           {/* Email */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Email</label>
+          <div>
+            <label htmlFor="email" className="block mb-1">Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
           {/* Address */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Address</label>
-            <textarea
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="2"
-            ></textarea>
+          <div>
+            <label htmlFor="address" className="block mb-1">Address</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-black rounded"
+            />
           </div>
 
           {/* VIN Number */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">VIN Number</label>
+          <div>
+            <label htmlFor="vin_number" className="block mb-1">VIN Number</label>
             <input
               type="text"
-              value={vinNumber}
-              onChange={(e) => setVinNumber(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="vin_number"
+              name="vin_number"
+              value={formData.vin_number}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
           {/* License Plate */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">License Plate</label>
+          <div>
+            <label htmlFor="license_plate" className="block mb-1">License Plate</label>
             <input
               type="text"
-              value={licensePlate}
-              onChange={(e) => setLicensePlate(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="license_plate"
+              name="license_plate"
+              value={formData.license_plate}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
           {/* Emergency Contact */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Emergency Contact</label>
+          <div>
+            <label htmlFor="emergency_contact" className="block mb-1">Emergency Contact</label>
             <input
               type="text"
-              value={emergencyContact}
-              onChange={(e) => setEmergencyContact(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="emergency_contact"
+              name="emergency_contact"
+              value={formData.emergency_contact}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-black rounded"
             />
           </div>
 
-          {/* Appointment Date and Time */}
-          <div className="mb-6 flex gap-4">
-            <div className="w-1/2">
-              <label className="block font-semibold mb-2">Appointment Date</label>
-              <input
-                type="date"
-                value={appointmentDate}
-                onChange={(e) => setAppointmentDate(e.target.value)}
-                className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="w-1/2">
-              <label className="block font-semibold mb-2">Appointment Time</label>
-              <input
-                type="time"
-                value={appointmentTime}
-                onChange={(e) => setAppointmentTime(e.target.value)}
-                className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Service Type */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Service Type</label>
-            <select
-              value={serviceType}
-              onChange={(e) => setServiceType(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select a service</option>
-              <option value="Oil Change">Oil Change</option>
-              <option value="Tire Rotation">Tire Rotation</option>
-              <option value="Brake Check">Brake Check</option>
-            </select>
-          </div>
-
-          {/* Additional Notes */}
-          <div className="mb-6">
-            <label className="block font-semibold mb-2">Additional Notes</label>
-            <textarea
-              value={additionalNotes}
-              onChange={(e) => setAdditionalNotes(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="4"
-              placeholder="Any additional requests or information..."
-            ></textarea>
-          </div>
-
-          {/* Save Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleSave}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md font-semibold transition duration-200"
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md"
           >
-            Save Changes
-          </motion.button>
-        </form>
-      </motion.div>
-    </motion.div>
-  );
-};
+            Save Profile
+          </button>
 
-export default Profile;
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-md mt-2"
+          >
+            Back to Dashboard
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
