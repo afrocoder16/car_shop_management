@@ -1,9 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState("User");
+
+  useEffect(() => {
+    // Fetch user information from the backend
+    const fetchUserName = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/customers/get-customer-name/", {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const fullName = data.name || `${data.first_name || ""} ${data.last_name || ""}`.trim();
+          setUserName(fullName || "User");
+        } else {
+          console.error("Failed to fetch user name: ", response.status);
+          setUserName("User");
+        }
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+        setUserName("User");
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   const navigateTo = (path) => {
     navigate(path);
@@ -59,8 +88,9 @@ const Dashboard = () => {
             transition={{ duration: 0.7 }}
             className="text-5xl font-extrabold mb-10 text-center"
           >
-            Welcome back, User!
+            Welcome back, {userName}!
           </motion.h2>
+        
 
           {/* Grid Layout */}
           <motion.div
