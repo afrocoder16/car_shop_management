@@ -5,6 +5,7 @@ from . import views
 from .views import (
     CustomerViewSet,
     create_or_get_customer,
+    customer_profile,
     sign_up,
     login,
     logout,
@@ -21,6 +22,7 @@ router.register(r'customers', CustomerViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('create-or-get-customer/', create_or_get_customer, name='create_or_get_customer'),
+    path('customer-profile/', customer_profile, name='customer_profile'),
     path('sign-up/', sign_up, name='sign_up'),
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),

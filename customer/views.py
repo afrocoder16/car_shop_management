@@ -1,4 +1,3 @@
-from django.db import models
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -9,8 +8,8 @@ from django.conf import settings
 from django.utils import timezone
 from .models import Customer, Appointment, Payment
 from .serializers import CustomerSerializer, AppointmentSerializer, PaymentSerializer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.shortcuts import get_object_or_404
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +17,6 @@ logger = logging.getLogger(__name__)
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-
 
 @api_view(['POST'])
 def create_or_get_customer(request):
@@ -40,9 +38,8 @@ def create_or_get_customer(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Allow access without authentication
+@permission_classes([AllowAny])
 def sign_up(request):
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name')
@@ -53,33 +50,31 @@ def sign_up(request):
         return Response({"detail": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
     user = User(username=email, email=email, first_name=first_name, last_name=last_name)
-    user.set_password(password)  
+    user.set_password(password)
     user.save()
+
+    customer = Customer(user=user, name=f"{first_name} {last_name}")
+    customer.save()
 
     token, _ = Token.objects.get_or_create(user=user)
 
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
 
-
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Allow access without authentication
+@permission_classes([AllowAny])
 def login(request):
     email = request.data.get('email')
     password = request.data.get('password')
 
     try:
         user = User.objects.get(email=email)
-        logger.debug(f"User found for email: {email}")
     except User.DoesNotExist:
-        logger.error(f"No user found for email: {email}")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if user.check_password(password):
-        logger.debug(f"Password matches for user: {email}")
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key}, status=status.HTTP_200_OK)
     else:
-        logger.error(f"Password mismatch for user: {email}")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
@@ -88,7 +83,6 @@ def logout(request):
         request.auth.delete()
         return Response({"detail": "Logged out successfully."}, status=status.HTTP_200_OK)
     return Response({"error": "You are not logged in."}, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['POST'])
 def reset_password(request):
@@ -112,6 +106,64 @@ def reset_password(request):
     except User.DoesNotExist:
         return Response({"detail": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def customer_profile(request):
+    try:
+        customer = Customer.objects.get(user=request.user)
+        serializer = CustomerSerializer(customer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_customer_name(request):
+    user = request.user
+    if user.is_authenticated:
+        full_name = f"{user.first_name} {user.last_name}".strip()
+        return Response({"name": full_name}, status=status.HTTP_200_OK)
+    return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def get_upcoming_appointments(request):
+    try:
+        customer = Customer.objects.get(user=request.user)
+        upcoming_appointments = Appointment.objects.filter(
+            customer=customer, appointment_date__gte=timezone.now()
+        ).order_by('appointment_date')
+        serializer = AppointmentSerializer(upcoming_appointments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_service_history(request):
+    try:
+        customer = Customer.objects.get(user=request.user)
+        service_history = Appointment.objects.filter(customer=customer).order_by('-appointment_date')
+        serializer = AppointmentSerializer(service_history, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_past_payments(request):
+    try:
+        customer = Customer.objects.get(user=request.user)
+        payments = Payment.objects.filter(customer=customer)
+        serializer = PaymentSerializer(payments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def test_token_auth(request):
+    return Response({"detail": f"Authenticated as {request.user}"}, status=status.HTTP_200_OK)
+
 
 def send_account_creation_email(user_email, user_name):
     subject = 'Account Created Successfully'
@@ -125,61 +177,3 @@ def send_account_creation_email(user_email, user_name):
     The Team
     """
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL or 'no-reply@example.com', [user_email], fail_silently=False)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_customer_name(request):
-    user = request.user
-    if user.is_authenticated:
-        full_name = f"{user.first_name} {user.last_name}".strip()
-        return Response({"name": full_name}, status=200)
-    return Response({"error": "User not authenticated"}, status=401)
-
-
-@api_view(['GET'])
-def get_upcoming_appointments(request):
-    user = request.user
-    if not user.is_authenticated:
-        return Response({"detail": "Authentication required."}, status=401)
-
-    try:
-        customer = Customer.objects.get(user=user)
-        upcoming_appointments = Appointment.objects.filter(
-            customer=customer, appointment_date__gte=timezone.now()
-        ).order_by('appointment_date')
-
-        serializer = AppointmentSerializer(upcoming_appointments, many=True)
-        return Response(serializer.data, status=200)
-    except Customer.DoesNotExist:
-        return Response({"detail": "Customer not found."}, status=404)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_service_history(request):
-    try:
-        customer = Customer.objects.get(user=request.user)
-        service_history = Appointment.objects.filter(customer=customer).order_by('-appointment_date')
-        serializer = AppointmentSerializer(service_history, many=True)
-        return Response(serializer.data, status=200)
-    except Customer.DoesNotExist:
-        return Response({"detail": "Customer not found."}, status=404)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_past_payments(request):
-    try:
-        customer = Customer.objects.get(user=request.user)
-        payments = Payment.objects.filter(customer=customer)
-        serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Customer.DoesNotExist:
-        return Response({"detail": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def test_token_auth(request):
-    return Response({"detail": f"Authenticated as {request.user}"}, status=200)

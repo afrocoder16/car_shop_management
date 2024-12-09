@@ -14,8 +14,8 @@ class Customer(models.Model):
     car_make = models.CharField(max_length=50, default="Unknown")
     car_model = models.CharField(max_length=50, default="Unknown")
     car_year = models.IntegerField(default=2000)
-    vin_number = models.CharField(max_length=15, unique=True, default="Unknown")
-    license_plate = models.CharField(max_length=15, unique=True, default="Unknown")
+    vin_number = models.CharField(max_length=15, blank=True, null=True)  # Removed unique constraint
+    license_plate = models.CharField(max_length=15, blank=True, null=True)  # Removed unique constraint
     loyalty_points = models.IntegerField(default=0)
     membership_level = models.CharField(max_length=50, blank=True, null=True)
     preferred_service_time = models.CharField(max_length=50, blank=True, null=True)
@@ -63,7 +63,6 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment of {self.amount} by {self.customer.name}"
-
 
 
 class Notification(models.Model):
