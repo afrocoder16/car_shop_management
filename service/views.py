@@ -103,3 +103,86 @@ def create_appointment(request):
             {"detail": f"An unexpected error occurred: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_car_progress(request):
+    """
+    Fetch car progress tracker data for the authenticated user.
+    """
+    try:
+        user = request.user
+        customer = Customer.objects.get(user=user)
+
+        appointments = Appointment.objects.filter(customer=customer).order_by('appointment_date')
+        data = {
+            "in_progress": appointments.filter(status="In Progress").values(),
+            "completed": appointments.filter(status="Completed").values(),
+            "pending": appointments.filter(status="Pending").values(),
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response(
+            {"detail": "Customer profile not found for the user."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        logger.exception("Error fetching car progress data.")
+        return Response(
+            {"detail": f"An unexpected error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_recent_repairs(request):
+    """
+    Fetch recent repairs for the authenticated user.
+    """
+    try:
+        user = request.user
+        customer = Customer.objects.get(user=user)
+
+        repairs = Appointment.objects.filter(
+            customer=customer, status="Completed"
+        ).order_by('-appointment_date')[:5]  # Fetch recent 5 repairs
+
+        return Response(repairs.values(), status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response(
+            {"detail": "Customer profile not found for the user."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        logger.exception("Error fetching recent repairs.")
+        return Response(
+            {"detail": f"An unexpected error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payment_summary(request):
+    """
+    Fetch payment summary for the authenticated user.
+    """
+    try:
+        user = request.user
+        customer = Customer.objects.get(user=user)
+
+        payments = customer.payments.order_by('-payment_date')[:5]  # Fetch recent 5 payments
+        return Response(payments.values(), status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+        return Response(
+            {"detail": "Customer profile not found for the user."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        logger.exception("Error fetching payment summary.")
+        return Response(
+            {"detail": f"An unexpected error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

@@ -39,26 +39,38 @@ def create_or_get_customer(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([AllowAny])  # Allow access without authentication
 def sign_up(request):
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name')
     email = request.data.get('email')
     password = request.data.get('password')
 
+    # Check if the email already exists in the User model
     if User.objects.filter(email=email).exists():
         return Response({"detail": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Create the User
     user = User(username=email, email=email, first_name=first_name, last_name=last_name)
-    user.set_password(password)
+    user.set_password(password)  # Set the hashed password
     user.save()
 
-    customer = Customer(user=user, name=f"{first_name} {last_name}")
-    customer.save()
+    # Check if a Customer with this email already exists
+    customer = Customer.objects.filter(email=email).first()
+    if not customer:
+        # Create a new Customer profile if one doesn't exist
+        customer = Customer(user=user, name=f"{first_name} {last_name}", email=email)
+        customer.save()
+    else:
+        # Link the existing Customer to the new user
+        customer.user = user
+        customer.save()
 
+    # Generate an auth token for the user
     token, _ = Token.objects.get_or_create(user=user)
 
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
