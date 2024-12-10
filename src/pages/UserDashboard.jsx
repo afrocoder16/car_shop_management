@@ -112,11 +112,6 @@ const Dashboard = () => {
     navigate(path);
   };
 
-<<<<<<< HEAD
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-6">
-      <div className="flex gap-6">
-=======
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -133,7 +128,6 @@ const Dashboard = () => {
     </button>
 
    
->>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
         <motion.div
           initial={{ x: -300 }}
           animate={{ x: 0 }}
@@ -146,7 +140,7 @@ const Dashboard = () => {
               { name: "Dashboard", path: "/Dashboard" },
               { name: "Bookings", path: "/bookings" },
               { name: "Billing", path: "/billing" },
-              { name: "Profile", path: "/profile" },
+              // { name: "Profile", path: "/profile" },
               { name: "Manage Cars", path: "/manage-cars" },
               { name: "Explore Services", path: "/explore-service" },
               { name: "Settings", path: "/settings" },
@@ -195,12 +189,9 @@ const Dashboard = () => {
                 >
                   Make Appointment
                 </button>
-<<<<<<< HEAD
-=======
                 <div className="flex justify-between items-center">
 
               </div>
->>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
               </div>
               <input
                 type="text"

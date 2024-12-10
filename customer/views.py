@@ -10,6 +10,8 @@ from .models import Customer, Appointment, Payment
 from .serializers import CustomerSerializer, AppointmentSerializer, PaymentSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
+from .models import UserProfile
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,10 +73,10 @@ def sign_up(request):
 
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
 
-<<<<<<< HEAD
-=======
+import logging
 
->>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
+logger = logging.getLogger(__name__)
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -84,33 +86,28 @@ def login(request):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
+        logger.error(f"Login failed: User with email {email} does not exist.")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if user.check_password(password):
         token, _ = Token.objects.get_or_create(user=user)
-<<<<<<< HEAD
-        
-        # Fetch the user's role from the UserProfile model
+
         try:
             role = user.userprofile.role
         except UserProfile.DoesNotExist:
+            logger.error(f"Login failed: UserProfile does not exist for user {user.username}.")
             return Response({"error": "User profile not found."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        logger.info(f"User {user.username} logged in successfully with role {role}.")
         return Response({
             "token": token.key,
             "role": role,
             "message": "Login successful."
         }, status=status.HTTP_200_OK)
     else:
+        logger.error(f"Login failed: Incorrect password for user {email}.")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-=======
-        return Response({"token": token.key}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
->>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
 @api_view(['POST'])
 def logout(request):
     if request.auth:

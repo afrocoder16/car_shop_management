@@ -40,8 +40,18 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token); // Save token in localStorage
-        alert("Login successful!");
-        navigate("/Dashboard"); // Redirect to Dashboard page after login
+        localStorage.setItem("role", data.role); // Save role in localStorage
+
+        // Redirect based on user role
+        if (data.role === "mechanic") {
+          navigate("/mechanics-dashboard");
+        } else if (data.role === "customer") {
+          navigate("/dashboard");
+        } else if (data.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          setError("Unknown role. Please contact support.");
+        }
       } else if (response.status === 401) {
         setError("Invalid email or password. Please try again.");
       } else {
