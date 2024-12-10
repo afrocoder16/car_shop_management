@@ -76,6 +76,7 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification to {self.customer.name} on {self.send_date}"
+<<<<<<< HEAD
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -88,3 +89,5 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
+=======
+>>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5

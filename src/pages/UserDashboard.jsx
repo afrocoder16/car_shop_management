@@ -112,9 +112,28 @@ const Dashboard = () => {
     navigate(path);
   };
 
+<<<<<<< HEAD
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-6">
       <div className="flex gap-6">
+=======
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-6">
+      <div className="flex gap-6">
+      <button
+      onClick={handleLogout}
+      className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
+    >
+      Logout
+    </button>
+
+   
+>>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
         <motion.div
           initial={{ x: -300 }}
           animate={{ x: 0 }}
@@ -176,6 +195,12 @@ const Dashboard = () => {
                 >
                   Make Appointment
                 </button>
+<<<<<<< HEAD
+=======
+                <div className="flex justify-between items-center">
+
+              </div>
+>>>>>>> 3841b5ee0dea5ed205e588e00373022c4b8d36e5
               </div>
               <input
                 type="text"
