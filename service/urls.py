@@ -1,12 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from . import views 
 from .views import (
     AppointmentViewSet, 
     ServiceTypeViewSet, 
     create_appointment,
     get_car_progress,
     get_recent_repairs,
-    get_payment_summary
+    get_payment_summary,
+    get_service_history,
+    get_estimated_cost
 )
 
 # Router setup for viewsets
@@ -15,9 +18,17 @@ router.register(r'appointments', AppointmentViewSet, basename='appointments')
 router.register(r'service-types', ServiceTypeViewSet, basename='service-types')
 
 urlpatterns = [
-    path('', include(router.urls)),  # Include routes for viewsets
-    path('create-appointment/', create_appointment, name='create_appointment'),  # Custom appointment creation endpoint
-    path('car-progress/', get_car_progress, name='get_car_progress'),  # Endpoint for car progress tracker
-    path('recent-repairs/', get_recent_repairs, name='get_recent_repairs'),  # Endpoint for recent repairs
-    path('payment-summary/', get_payment_summary, name='get_payment_summary'),  # Endpoint for payment summary
+    path('appointments/', views.AppointmentViewSet.as_view({'get': 'list', 'post': 'create'}), name='appointments'),
+    path('service-types/', views.ServiceTypeViewSet.as_view({'get': 'list'}), name='service-types'),
+    path('car-progress/', views.get_car_progress, name='car-progress'),
+    path('recent-repairs/', views.get_recent_repairs, name='recent-repairs'),
+    path('payment-summary/', views.get_payment_summary, name='payment-summary'),
+    path('estimated-cost/', views.get_estimated_cost, name='estimated_cost'),
+    path('service-history/', views.get_service_history, name='service-history'),
+    path('create-appointment/', views.create_appointment, name='create-appointment'),
+    path('payment-history/', views.get_payment_history, name='payment_history'),
+
 ]
+
+
+

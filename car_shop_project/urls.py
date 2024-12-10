@@ -7,4 +7,5 @@ urlpatterns = [
     path('api/customers/', include('customer.urls')),  
     path('api/services/', include('service.urls')),  
     path('api/auth/login/', obtain_auth_token, name='api_token_auth'),  
+    
 ]

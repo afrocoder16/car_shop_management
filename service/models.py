@@ -44,6 +44,9 @@ class Service(models.Model):
     customer = models.ForeignKey('customer.Customer', on_delete=models.CASCADE)  # Each service is linked to a customer
     mechanic = models.ForeignKey('mechanic.Mechanic', on_delete=models.CASCADE)  # Each service is assigned to a mechanic
 
+    # Adding notes field to resolve the issue
+    notes = models.TextField(blank=True, null=True)  # Field for additional notes
+
     def __str__(self):
         return f"Service for {self.customer.name} - {self.service_type.name}"
 
@@ -70,4 +73,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment {self.id} - {self.amount} ({self.payment_status})"
-

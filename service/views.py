@@ -1,7 +1,9 @@
+from .models import Service
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Sum
 import logging
 
 from .models import Appointment, ServiceType
@@ -117,9 +119,9 @@ def get_car_progress(request):
 
         appointments = Appointment.objects.filter(customer=customer).order_by('appointment_date')
         data = {
-            "in_progress": appointments.filter(status="In Progress").values(),
-            "completed": appointments.filter(status="Completed").values(),
-            "pending": appointments.filter(status="Pending").values(),
+            "in_progress": list(appointments.filter(status="In Progress").values()),
+            "completed": list(appointments.filter(status="Completed").values()),
+            "pending": list(appointments.filter(status="Pending").values()),
         }
         return Response(data, status=status.HTTP_200_OK)
     except Customer.DoesNotExist:
@@ -149,7 +151,7 @@ def get_recent_repairs(request):
             customer=customer, status="Completed"
         ).order_by('-appointment_date')[:5]  # Fetch recent 5 repairs
 
-        return Response(repairs.values(), status=status.HTTP_200_OK)
+        return Response(list(repairs.values()), status=status.HTTP_200_OK)
     except Customer.DoesNotExist:
         return Response(
             {"detail": "Customer profile not found for the user."},
@@ -162,27 +164,92 @@ def get_recent_repairs(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_payment_summary(request):
+    try:
+        customer = request.user.customer  # Ensure this links to the authenticated customer
+        services = Service.objects.filter(customer=customer)
+        total_cost = services.aggregate(total=Sum('estimated_cost'))['total'] or 0
+        return Response({"total_cost": total_cost}, status=200)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found."}, status=404)
+    except Exception as e:
+        logger.exception("Error fetching payment summary.")
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_estimated_cost(request):
+    try:
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"error": "User not authenticated."}, status=401)
+
+        # Assuming `Service` has a `customer` field linked to the authenticated user
+        services = Service.objects.filter(customer__user=user).values_list('estimated_cost', flat=True)
+        total_estimated_cost = sum(services)
+
+        return Response({"estimated_cost": total_estimated_cost}, status=200)
+    except Exception as e:
+        logger.exception("Error fetching estimated cost.")
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_service_history(request):
     """
-    Fetch payment summary for the authenticated user.
+    Fetch the service history for the authenticated user.
     """
     try:
         user = request.user
         customer = Customer.objects.get(user=user)
 
-        payments = customer.payments.order_by('-payment_date')[:5]  # Fetch recent 5 payments
-        return Response(payments.values(), status=status.HTTP_200_OK)
+        services = Service.objects.filter(customer=customer).order_by('-service_date')
+        service_data = [
+            {
+                "service_type": service.service_type.name,
+                "service_date": service.service_date,
+                "status": service.status,
+                "notes": service.notes,
+                "mechanic": service.mechanic.name,
+                "estimated_completion_time": service.estimated_completion_time,
+            }
+            for service in services
+        ]
+
+        return Response(service_data, status=status.HTTP_200_OK)
     except Customer.DoesNotExist:
         return Response(
             {"detail": "Customer profile not found for the user."},
             status=status.HTTP_404_NOT_FOUND,
         )
     except Exception as e:
-        logger.exception("Error fetching payment summary.")
+        logger.exception("Error fetching service history.")
         return Response(
             {"detail": f"An unexpected error occurred: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payment_history(request):
+    try:
+        user = request.user
+        services = Service.objects.filter(customer__user=user).prefetch_related('parts_used')
+
+        payment_history = []
+        for service in services:
+            payment_history.append({
+                "total_cost": service.total_cost,
+                "estimated_cost": service.estimated_cost,
+                "payment_status": service.payment_status,
+                "invoice_number": service.invoice_number,
+                "parts_used": ", ".join([part.part_name for part in service.parts_used.all()]) if service.parts_used.exists() else "N/A",  # Correctly fetch part names
+            })
+
+        return Response(payment_history, status=200)
+    except Exception as e:
+        logger.exception("Error fetching payment history.")
+        return Response({"error": str(e)}, status=500)
+

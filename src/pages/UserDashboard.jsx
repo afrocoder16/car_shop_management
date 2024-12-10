@@ -6,7 +6,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("User");
   const [carProgress, setCarProgress] = useState([]);
-  const [paymentSummary, setPaymentSummary] = useState([]);
+  const [paymentSummary, setPaymentSummary] = useState(0);
   const [recentRepairs, setRecentRepairs] = useState([]);
   const [loading, setLoading] = useState({
     user: true,
@@ -24,7 +24,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch user information
         const userResponse = await fetch("http://127.0.0.1:8000/api/customers/get-customer-name/", {
           method: "GET",
           headers: {
@@ -46,7 +45,6 @@ const Dashboard = () => {
       }
 
       try {
-        // Fetch car progress tracker data
         const progressResponse = await fetch("http://127.0.0.1:8000/api/services/car-progress/", {
           method: "GET",
           headers: {
@@ -67,17 +65,16 @@ const Dashboard = () => {
       }
 
       try {
-        // Fetch payment summary data
-        const paymentResponse = await fetch("http://127.0.0.1:8000/api/services/payment-summary/", {
+        const paymentSummaryResponse = await fetch("http://127.0.0.1:8000/api/services/payment-summary/", {
           method: "GET",
           headers: {
             Authorization: `Token ${localStorage.getItem("token")}`,
           },
         });
 
-        if (paymentResponse.ok) {
-          const paymentData = await paymentResponse.json();
-          setPaymentSummary(paymentData);
+        if (paymentSummaryResponse.ok) {
+          const paymentData = await paymentSummaryResponse.json();
+          setPaymentSummary(paymentData.total_cost || 0);
         } else {
           setError((prev) => ({ ...prev, payment: "Failed to fetch payment summary." }));
         }
@@ -88,8 +85,7 @@ const Dashboard = () => {
       }
 
       try {
-        // Fetch recent repairs data
-        const repairsResponse = await fetch("http://127.0.0.1:8000/api/services/recent-repairs/", {
+        const repairsResponse = await fetch("http://127.0.0.1:8000/api/services/service-history/", {
           method: "GET",
           headers: {
             Authorization: `Token ${localStorage.getItem("token")}`,
@@ -140,7 +136,6 @@ const Dashboard = () => {
                 key={index}
                 className="hover:text-blue-400 cursor-pointer transition-all duration-200 text-lg font-semibold"
                 onClick={() => navigateTo(item.path)}
-                title={`Go to ${item.name}`}
               >
                 {item.name}
               </li>
@@ -187,32 +182,32 @@ const Dashboard = () => {
                 placeholder="Search cars..."
                 className="w-full p-3 rounded-md text-black mb-4"
               />
-              {loading.progress ? (
-                <p>Loading car progress...</p>
-              ) : error.progress ? (
-                <p className="text-red-500">{error.progress}</p>
-              ) : carProgress.length > 0 ? (
-                <ul className="space-y-4 h-[70%] overflow-y-auto">
-                  {carProgress.map((car, index) => (
+              {loading.repairs ? (
+                <p>Loading service history...</p>
+              ) : error.repairs ? (
+                <p className="text-red-500">{error.repairs}</p>
+              ) : recentRepairs.length > 0 ? (
+                <ul className="space-y-4">
+                  {recentRepairs.map((service, index) => (
                     <li
                       key={index}
-                      className="flex justify-between bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600"
+                      className="bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600"
                     >
-                      <span>{car.name}</span>
-                      <span
-                        className={`font-bold ${
-                          car.status === "In Progress"
-                            ? "text-yellow-400"
-                            : "text-green-400"
-                        }`}
-                      >
-                        {car.status}
-                      </span>
+                      <div className="flex justify-between">
+                        <span className="font-bold">{service.service_type}</span>
+                        <span className="text-sm text-gray-400">{service.service_date}</span>
+                      </div>
+                      <p>
+                        Status: <span className="text-yellow-400">{service.status}</span>
+                      </p>
+                      <p>Mechanic: {service.mechanic}</p>
+                      <p>Estimated Completion Time: {service.estimated_completion_time}</p>
+                      <p>Notes: {service.notes}</p>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p>No car progress data available.</p>
+                <p>No service history available.</p>
               )}
             </motion.div>
 
@@ -226,56 +221,13 @@ const Dashboard = () => {
                 <p>Loading payment summary...</p>
               ) : error.payment ? (
                 <p className="text-red-500">{error.payment}</p>
-              ) : paymentSummary.length > 0 ? (
-                <ul className="space-y-4">
-                  {paymentSummary.map((payment, index) => (
-                    <li
-                      key={index}
-                      className="flex justify-between bg-gray-700 p-3 rounded-md"
-                    >
-                      <span>{payment.date}</span>
-                      <span className="font-bold">${payment.amount}</span>
-                    </li>
-                  ))}
-                </ul>
+              ) : paymentSummary > 0 ? (
+                <p className="text-4xl font-extrabold">${paymentSummary.toFixed(2)}</p>
               ) : (
-                <p>No payment data available.</p>
+                <p>No payment summary available.</p>
               )}
             </motion.div>
           </motion.div>
-        </motion.div>
-      </div>
-
-      <div className="mt-10">
-        <h3 className="text-3xl font-bold mb-4">Recent Repairs</h3>
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          onClick={() => navigateTo("/recent-repairs")}
-          className="bg-gray-800 p-6 rounded-lg shadow-md h-60 cursor-pointer overflow-y-auto"
-        >
-          {loading.repairs ? (
-            <p>Loading recent repairs...</p>
-          ) : error.repairs ? (
-            <p className="text-red-500">{error.repairs}</p>
-          ) : recentRepairs.length > 0 ? (
-            <div className="space-y-4">
-              {recentRepairs.map((repair, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between bg-gray-700 p-4 rounded-lg hover:bg-gray-600 shadow-md"
-                >
-                  <span>{repair.name}</span>
-                  <span
-                    className={`font-bold ${repair.color || "text-gray-400"}`}
-                  >
-                    {repair.time}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No recent repairs available.</p>
-          )}
         </motion.div>
       </div>
 
