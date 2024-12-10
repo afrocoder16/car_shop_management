@@ -71,7 +71,6 @@ def sign_up(request):
 
     return Response({"token": token.key, "detail": "Account created successfully."}, status=status.HTTP_201_CREATED)
 
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -85,9 +84,21 @@ def login(request):
 
     if user.check_password(password):
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key}, status=status.HTTP_200_OK)
+        
+        # Fetch the user's role from the UserProfile model
+        try:
+            role = user.userprofile.role
+        except UserProfile.DoesNotExist:
+            return Response({"error": "User profile not found."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            "token": token.key,
+            "role": role,
+            "message": "Login successful."
+        }, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 @api_view(['POST'])
 def logout(request):

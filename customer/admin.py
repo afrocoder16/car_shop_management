@@ -1,6 +1,6 @@
 from django.contrib import admin
 from service.models import Service  # Import Service model
-from .models import Customer, Notification  # Import Customer and Notification models
+from .models import Customer, Notification, UserProfile  # Import Customer, Notification, and UserProfile models
 
 class ServiceInline(admin.TabularInline):
     model = Service
@@ -23,3 +23,9 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ('customer', 'notification_type', 'send_date')
     search_fields = ('customer__name', 'message')
     list_filter = ('notification_type', 'send_date')
+
+# Register UserProfile
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role')  # Display these fields in the admin list view
+    list_filter = ('role',)  # Add filter options for roles
